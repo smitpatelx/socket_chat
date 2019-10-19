@@ -1,0 +1,17 @@
+doctype html
+html
+  head
+    meta(charset='utf-8')
+    meta(http-equiv='x-ua-compatible', content='ie=edge; chrome=1')
+    meta(name='viewport', content='width=device-width, initial-scale=1.0, user-scalable=no')
+    base(href='http://localhost:3000/')
+
+    title= title
+    link(rel="icon", href="/images/logo-sm-50.png", type="image/gif", sizes="16x16")
+    link(rel='stylesheet', href='/stylesheets/app.css')
+    
+  body
+    div(class="container mx-auto font-sans antialiased" id="app")
+      block content
+
+    script(src="/javascripts/app.js" async)
