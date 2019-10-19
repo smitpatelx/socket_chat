@@ -54,9 +54,6 @@ export default {
             };
             this.current_date = fullDate;
         }
-    },
-    computed:{
-
     }
 }
 </script>

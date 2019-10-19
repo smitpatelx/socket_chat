@@ -187,6 +187,9 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony import */ var _ChatInput_vue__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ./ChatInput.vue */ "./resources/js/components/ChatInput.vue");
 /* harmony import */ var socket_io_client_dist_socket_io_js__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! socket.io-client/dist/socket.io.js */ "./node_modules/socket.io-client/dist/socket.io.js");
 /* harmony import */ var socket_io_client_dist_socket_io_js__WEBPACK_IMPORTED_MODULE_1___default = /*#__PURE__*/__webpack_require__.n(socket_io_client_dist_socket_io_js__WEBPACK_IMPORTED_MODULE_1__);
+/* harmony import */ var vue2_transitions__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! vue2-transitions */ "./node_modules/vue2-transitions/dist/vue2-transitions.m.js");
+//
+//
 //
 //
 //
@@ -204,10 +207,13 @@ __webpack_require__.r(__webpack_exports__);
 //
 //
 
+
+ //Chat Component
 
 var cbi = {
   components: {
-    ChatInput: _ChatInput_vue__WEBPACK_IMPORTED_MODULE_0__["default"]
+    ChatInput: _ChatInput_vue__WEBPACK_IMPORTED_MODULE_0__["default"],
+    SlideXLeftTransition: vue2_transitions__WEBPACK_IMPORTED_MODULE_2__["SlideXLeftTransition"]
   },
   props: {
     name_val: {
@@ -218,7 +224,8 @@ var cbi = {
   },
   data: function data() {
     return {
-      messages: []
+      messages: [],
+      current_msg: {}
     };
   },
   computed: {
@@ -234,15 +241,11 @@ var cbi = {
       return fullDate;
     }
   },
-  methods: {
-    add_message: function add_message(data) {
-      this.messages.push(data);
-    }
-  },
   mounted: function mounted() {
     var socket = socket_io_client_dist_socket_io_js__WEBPACK_IMPORTED_MODULE_1___default()();
     var that = this;
     socket.on('chat_message2', function (data) {
+      // console.log("ChatBoxIn user_id check:", data.user_id == that.name_val.id ? 'true' : 'false');
       that.messages.push(data);
     });
   }
@@ -316,8 +319,7 @@ __webpack_require__.r(__webpack_exports__);
       };
       this.current_date = fullDate;
     }
-  },
-  computed: {}
+  }
 });
 
 /***/ }),
@@ -2887,6 +2889,94 @@ exports.clearImmediate = (typeof self !== "undefined" && self.clearImmediate) ||
 
 /***/ }),
 
+/***/ "./node_modules/vue-chat-scroll/dist/vue-chat-scroll.js":
+/*!**************************************************************!*\
+  !*** ./node_modules/vue-chat-scroll/dist/vue-chat-scroll.js ***!
+  \**************************************************************/
+/*! no static exports found */
+/***/ (function(module, exports, __webpack_require__) {
+
+(function (global, factory) {
+	 true ? module.exports = factory() :
+	undefined;
+}(this, (function () { 'use strict';
+
+/**
+* @name VueJS vChatScroll (vue-chat-scroll)
+* @description Monitors an element and scrolls to the bottom if a new child is added
+* @author Theodore Messinezis <theo@theomessin.com>
+* @file v-chat-scroll  directive definition
+*/
+
+var scrollToBottom = function scrollToBottom(el, smooth) {
+  if (typeof el.scroll === "function") {
+    el.scroll({
+      top: el.scrollHeight,
+      behavior: smooth ? 'smooth' : 'instant'
+    });
+  } else {
+    el.scrollTop = el.scrollHeight;
+  }
+};
+
+var vChatScroll = {
+  bind: function bind(el, binding) {
+    var scrolled = false;
+
+    el.addEventListener('scroll', function (e) {
+      scrolled = el.scrollTop + el.clientHeight + 1 < el.scrollHeight;
+    });
+
+    new MutationObserver(function (e) {
+      var config = binding.value || {};
+      var pause = config.always === false && scrolled;
+      var addedNodes = e[e.length - 1].addedNodes.length;
+      var removedNodes = e[e.length - 1].removedNodes.length;
+
+      if (config.scrollonremoved) {
+        if (pause || addedNodes != 1 && removedNodes != 1) return;
+      } else {
+        if (pause || addedNodes != 1) return;
+      }
+
+      var smooth = config.smooth;
+      var loadingRemoved = !addedNodes && removedNodes === 1;
+      if (loadingRemoved && config.scrollonremoved && 'smoothonremoved' in config) {
+        smooth = config.smoothonremoved;
+      }
+      scrollToBottom(el, smooth);
+    }).observe(el, { childList: true, subtree: true });
+  },
+  inserted: function inserted(el, binding) {
+    var config = binding.value || {};
+    scrollToBottom(el, config.smooth);
+  }
+};
+
+/**
+* @name VueJS vChatScroll (vue-chat-scroll)
+* @description Monitors an element and scrolls to the bottom if a new child is added
+* @author Theodore Messinezis <theo@theomessin.com>
+* @file vue-chat-scroll plugin definition
+*/
+
+var VueChatScroll = {
+  install: function install(Vue, options) {
+    Vue.directive('chat-scroll', vChatScroll);
+  }
+};
+
+if (typeof window !== 'undefined' && window.Vue) {
+  window.Vue.use(VueChatScroll);
+}
+
+return VueChatScroll;
+
+})));
+
+
+/***/ }),
+
 /***/ "./node_modules/vue-loader/lib/loaders/templateLoader.js?!./node_modules/vue-loader/lib/index.js?!./resources/js/components/ChatBox.vue?vue&type=template&id=5142db38&":
 /*!**********************************************************************************************************************************************************************************************************!*\
   !*** ./node_modules/vue-loader/lib/loaders/templateLoader.js??vue-loader-options!./node_modules/vue-loader/lib??vue-loader-options!./resources/js/components/ChatBox.vue?vue&type=template&id=5142db38& ***!
@@ -2913,7 +3003,7 @@ var render = function() {
         "div",
         {
           staticClass:
-            "w-full my-3 py-1 px-4 justify-between flex bg-primary rounded shadow-sm"
+            "w-full my-3 py-1 px-4 justify-between flex bg-white rounded shadow-sm"
         },
         [
           _vm._m(0),
@@ -2924,7 +3014,7 @@ var render = function() {
                   "span",
                   {
                     staticClass:
-                      "flex flex-wrap flex-row text-right text-white text-sm my-1 ml-2 py-1 px-2 font-semibold rounded border border-solid border-white"
+                      "flex flex-wrap flex-row text-right text-primary text-sm my-1 ml-2 py-1 px-2 font-semibold rounded border border-solid border-primary"
                   },
                   [
                     _c(
@@ -2964,7 +3054,7 @@ var render = function() {
                             _c("path", {
                               attrs: { d: "M0,172v-172h172v172z", fill: "none" }
                             }),
-                            _c("g", { attrs: { fill: "#ffffff" } }, [
+                            _c("g", { attrs: { fill: "#2366ce" } }, [
                               _c("path", {
                                 attrs: {
                                   d:
@@ -2987,14 +3077,14 @@ var render = function() {
                   "span",
                   {
                     staticClass:
-                      "cursor-pointer flex flex-wrap flex-row text-right text-white hover:text-black hover:bg-white text-sm my-1 ml-2 py-1 px-2 font-semibold rounded border border-solid border-white",
+                      "cursor-pointer flex flex-wrap flex-row text-right text-primary hover:text-black bg-primary hover:bg-primary-800 text-sm my-1 ml-2 py-1 px-2 font-semibold rounded border border-solid border-primary",
                     on: { click: _vm.delete_name }
                   },
                   [
                     _c(
                       "svg",
                       {
-                        staticStyle: { fill: "#000000" },
+                        staticStyle: { fill: "#2366ce" },
                         attrs: {
                           xmlns: "http://www.w3.org/2000/svg",
                           x: "0px",
@@ -3113,7 +3203,9 @@ var staticRenderFns = [
     return _c("div", { staticClass: "flex" }, [
       _c(
         "span",
-        { staticClass: "text-white text-sm my-1 ml-2 py-1 px-2 font-semibold" },
+        {
+          staticClass: "text-gray-600 text-sm my-1 ml-2 py-1 px-2 font-semibold"
+        },
         [_vm._v("Build with : ")]
       ),
       _vm._v(" "),
@@ -3180,65 +3272,90 @@ var render = function() {
     _c(
       "div",
       {
-        staticClass:
-          "flex-1 overflow-auto py-2 px-2 shadow-xl rounded-t-lg bg-white antialiased"
-      },
-      _vm._l(_vm.messages, function(data, i) {
-        return _c(
-          "div",
+        directives: [
           {
-            key: i,
-            staticClass: "flex mb-2",
-            class: data.id != _vm.name_val.id ? "justify-end" : "justify-start"
-          },
-          [
-            _c(
+            name: "chat-scroll",
+            rawName: "v-chat-scroll",
+            value: { always: false, smooth: true },
+            expression: "{always: false, smooth: true}"
+          }
+        ],
+        staticClass:
+          "flex-1 overflow-auto py-2 px-2 shadow-xl rounded-t-lg bg-white antialiased overflow-x-hidden overflow-y-visible",
+        staticStyle: { "max-height": "75vh" }
+      },
+      [
+        _c(
+          "slide-x-left-transition",
+          { attrs: { group: "" } },
+          _vm._l(_vm.messages, function(data, i) {
+            return _c(
               "div",
               {
-                staticClass: "m-2 py-1 px-3 rounded shadow-sm",
+                key: i,
+                staticClass: "flex mb-2",
                 class:
-                  data.id != _vm.name_val.id ? "bg-gray-300" : "bg-primary-200"
+                  data.user_id == _vm.name_val.id
+                    ? "justify-end"
+                    : "justify-start"
               },
               [
                 _c(
-                  "p",
+                  "div",
                   {
-                    staticClass: "text-left",
+                    staticClass: "m-2 py-1 px-3 rounded shadow-sm",
                     class:
-                      data.id != _vm.name_val.id
-                        ? "text-gray-800"
-                        : "text-gray-300"
+                      data.user_id == _vm.name_val.id
+                        ? "bg-gray-300"
+                        : "bg-primary-200"
                   },
-                  [_vm._v(_vm._s(data.name))]
-                ),
-                _vm._v(" "),
-                _c(
-                  "p",
-                  {
-                    staticClass: "font-semibold",
-                    class:
-                      data.id != _vm.name_val.id ? "text-black" : "text-white"
-                  },
-                  [_vm._v(_vm._s(data.message))]
-                ),
-                _vm._v(" "),
-                _c(
-                  "p",
-                  {
-                    staticClass: "text-right text-xs mt-1",
-                    class:
-                      data.id != _vm.name_val.id
-                        ? "text-gray-700"
-                        : "text-gray-200"
-                  },
-                  [_vm._v(_vm._s(data.time))]
+                  [
+                    data.user_id != _vm.name_val.id
+                      ? _c(
+                          "p",
+                          {
+                            staticClass: "text-left",
+                            class:
+                              data.user_id == _vm.name_val.id
+                                ? "text-gray-800"
+                                : "text-gray-300"
+                          },
+                          [_vm._v(_vm._s(data.name))]
+                        )
+                      : _vm._e(),
+                    _vm._v(" "),
+                    _c(
+                      "p",
+                      {
+                        staticClass: "font-semibold",
+                        class:
+                          data.user_id == _vm.name_val.id
+                            ? "text-black"
+                            : "text-white"
+                      },
+                      [_vm._v(_vm._s(data.message))]
+                    ),
+                    _vm._v(" "),
+                    _c(
+                      "p",
+                      {
+                        staticClass: "text-right text-xs mt-1",
+                        class:
+                          data.user_id == _vm.name_val.id
+                            ? "text-gray-700"
+                            : "text-gray-200"
+                      },
+                      [_vm._v(_vm._s(data.time))]
+                    )
+                  ]
                 )
               ]
             )
-          ]
+          }),
+          0
         )
-      }),
-      0
+      ],
+      1
     ),
     _vm._v(" "),
     _c(
@@ -15425,6 +15542,539 @@ if (false) {} else {
 
 /***/ }),
 
+/***/ "./node_modules/vue2-transitions/dist/vue2-transitions.m.js":
+/*!******************************************************************!*\
+  !*** ./node_modules/vue2-transitions/dist/vue2-transitions.m.js ***!
+  \******************************************************************/
+/*! exports provided: FadeTransition, ZoomCenterTransition, ZoomXTransition, ZoomYTransition, CollapseTransition, ScaleTransition, SlideYUpTransition, SlideYDownTransition, SlideXLeftTransition, SlideXRightTransition, default */
+/***/ (function(module, __webpack_exports__, __webpack_require__) {
+
+"use strict";
+__webpack_require__.r(__webpack_exports__);
+/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "FadeTransition", function() { return FadeTransition; });
+/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "ZoomCenterTransition", function() { return ZoomCenterTransition; });
+/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "ZoomXTransition", function() { return ZoomXTransition; });
+/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "ZoomYTransition", function() { return ZoomYTransition; });
+/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "CollapseTransition", function() { return CollapseTransition; });
+/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "ScaleTransition", function() { return ScaleTransition; });
+/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "SlideYUpTransition", function() { return SlideYUpTransition; });
+/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "SlideYDownTransition", function() { return SlideYDownTransition; });
+/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "SlideXLeftTransition", function() { return SlideXLeftTransition; });
+/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "SlideXRightTransition", function() { return SlideXRightTransition; });
+/*!
+ * vue2-transitions v0.3.0
+ * (c) 2019-present cristij <joracristi@gmail.com>
+ * Released under the MIT License.
+ */
+var baseTransition = {
+  inheritAttrs: false,
+  props: {
+    /**
+     * Transition duration. Number for specifying the same duration for enter/leave transitions
+     * Object style {enter: 300, leave: 300} for specifying explicit durations for enter/leave
+     */
+    duration: {
+      type: [Number, Object],
+      default: 300
+    },
+    /**
+     * Transition delay. Number for specifying the same delay for enter/leave transitions
+     * Object style {enter: 300, leave: 300} for specifying explicit durations for enter/leave
+     */
+    delay: {
+      type: [Number, Object],
+      default: 0
+    },
+    /**
+     * Whether the component should be a `transition-group` component.
+     */
+    group: Boolean,
+    /**
+     * Transition tag, in case the component is a `transition-group`
+     */
+    tag: {
+      type: String,
+      default: 'span'
+    },
+    /**
+     *  Transform origin property https://tympanus.net/codrops/css_reference/transform-origin/.
+     *  Can be specified with styles as well but it's shorter with this prop
+     */
+    origin: {
+      type: String,
+      default: ''
+    },
+    /**
+     * Element styles that are applied during transition. These styles are applied on @beforeEnter and @beforeLeave hooks
+     */
+    styles: {
+      type: Object,
+      default: function () {
+        return {
+          animationFillMode: 'both',
+          animationTimingFunction: 'ease-out'
+        };
+      }
+    }
+  },
+  computed: {
+    componentType: function componentType() {
+      return this.group ? 'transition-group' : 'transition';
+    },
+    hooks: function hooks() {
+      return Object.assign({
+        beforeEnter: this.beforeEnter,
+        afterEnter: this.cleanUpStyles,
+        beforeLeave: this.beforeLeave,
+        leave: this.leave,
+        afterLeave: this.cleanUpStyles
+      }, this.$listeners);
+    }
+  },
+  methods: {
+    beforeEnter: function beforeEnter(el) {
+      var enterDuration = this.duration.enter ? this.duration.enter : this.duration;
+      el.style.animationDuration = enterDuration + "ms";
+
+      var enterDelay = this.delay.enter ? this.delay.enter : this.delay;
+      el.style.animationDelay = enterDelay + "ms";
+
+      this.setStyles(el);
+    },
+    cleanUpStyles: function cleanUpStyles(el) {
+      var this$1 = this;
+
+      Object.keys(this.styles).forEach(function (key) {
+        var styleValue = this$1.styles[key];
+        if (styleValue) {
+          el.style[key] = '';
+        }
+      });
+      el.style.animationDuration = '';
+      el.style.animationDelay = '';
+    },
+    beforeLeave: function beforeLeave(el) {
+      var leaveDuration = this.duration.leave ? this.duration.leave : this.duration;
+      el.style.animationDuration = leaveDuration + "ms";
+
+      var leaveDelay = this.delay.leave ? this.delay.leave : this.delay;
+      el.style.animationDelay = leaveDelay + "ms";
+
+      this.setStyles(el);
+    },
+    leave: function leave(el) {
+      this.setAbsolutePosition(el);
+    },
+    setStyles: function setStyles(el) {
+      var this$1 = this;
+
+      this.setTransformOrigin(el);
+      Object.keys(this.styles).forEach(function (key) {
+        var styleValue = this$1.styles[key];
+        if (styleValue) {
+          el.style[key] = styleValue;
+        }
+      });
+    },
+    setAbsolutePosition: function setAbsolutePosition(el) {
+      if (this.group) {
+        el.style.position = 'absolute';
+      }
+      return this;
+    },
+    setTransformOrigin: function setTransformOrigin(el) {
+      if (this.origin) {
+        el.style.transformOrigin = this.origin;
+      }
+      return this;
+    }
+  }
+};
+
+(function () {
+  if (typeof document !== 'undefined') {
+    var head = document.head || document.getElementsByTagName('head')[0],
+        style = document.createElement('style'),
+        css = " @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } } .fadeIn { animation-name: fadeIn; } @keyframes fadeOut { from { opacity: 1; } to { opacity: 0; } } .fadeOut { animation-name: fadeOut; } .fade-move { transition: transform .3s ease-out; } ";style.type = 'text/css';if (style.styleSheet) {
+      style.styleSheet.cssText = css;
+    } else {
+      style.appendChild(document.createTextNode(css));
+    }head.appendChild(style);
+  }
+})();
+
+var FadeTransition = { render: function () {
+    var _vm = this;var _h = _vm.$createElement;var _c = _vm._self._c || _h;return _c(_vm.componentType, _vm._g(_vm._b({ tag: "component", attrs: { "tag": _vm.tag, "enter-active-class": "fadeIn", "move-class": "fade-move", "leave-active-class": "fadeOut" } }, 'component', _vm.$attrs, false), _vm.hooks), [_vm._t("default")], 2);
+  }, staticRenderFns: [],
+  name: 'fade-transition',
+  mixins: [baseTransition]
+};
+
+(function () {
+  if (typeof document !== 'undefined') {
+    var head = document.head || document.getElementsByTagName('head')[0],
+        style = document.createElement('style'),
+        css = ".zoom-move { transition: transform .3s ease-out; } @keyframes zoomIn { from { opacity: 0; transform: scale3d(0.3, 0.3, 0.3); } 50% { opacity: 1; } } .zoomIn { animation-name: zoomIn; } @keyframes zoomOut { from { opacity: 1; } 50% { opacity: 0; transform: scale3d(0.3, 0.3, 0.3); } to { opacity: 0; } } .zoomOut { animation-name: zoomOut; } ";style.type = 'text/css';if (style.styleSheet) {
+      style.styleSheet.cssText = css;
+    } else {
+      style.appendChild(document.createTextNode(css));
+    }head.appendChild(style);
+  }
+})();
+
+var ZoomCenterTransition = { render: function () {
+    var _vm = this;var _h = _vm.$createElement;var _c = _vm._self._c || _h;return _c(_vm.componentType, _vm._g(_vm._b({ tag: "component", attrs: { "tag": _vm.tag, "enter-active-class": "zoomIn", "move-class": "zoom-move", "leave-active-class": "zoomOut" } }, 'component', _vm.$attrs, false), _vm.hooks), [_vm._t("default")], 2);
+  }, staticRenderFns: [],
+  name: 'zoom-center-transition',
+  mixins: [baseTransition]
+};
+
+(function () {
+  if (typeof document !== 'undefined') {
+    var head = document.head || document.getElementsByTagName('head')[0],
+        style = document.createElement('style'),
+        css = ".zoom-move { transition: transform .3s ease-out; } @keyframes zoomInX { from { opacity: 0; transform: scaleX(0); } 50% { opacity: 1; } } .zoomInX { animation-name: zoomInX; } @keyframes zoomOutX { from { opacity: 1; } 50% { opacity: 0; transform: scaleX(0); } to { opacity: 0; } } .zoomOutX { animation-name: zoomOutX; } ";style.type = 'text/css';if (style.styleSheet) {
+      style.styleSheet.cssText = css;
+    } else {
+      style.appendChild(document.createTextNode(css));
+    }head.appendChild(style);
+  }
+})();
+
+var ZoomXTransition = { render: function () {
+    var _vm = this;var _h = _vm.$createElement;var _c = _vm._self._c || _h;return _c(_vm.componentType, _vm._g(_vm._b({ tag: "component", attrs: { "tag": _vm.tag, "enter-active-class": "zoomInX", "move-class": "zoom-move", "leave-active-class": "zoomOutX" } }, 'component', _vm.$attrs, false), _vm.hooks), [_vm._t("default")], 2);
+  }, staticRenderFns: [],
+  name: 'zoom-x-transition',
+  props: {
+    styles: {
+      type: Object,
+      default: function () {
+        return {
+          animationFillMode: 'both',
+          animationTimingFunction: 'cubic-bezier(.55,0,.1,1)'
+        };
+      }
+    }
+  },
+  mixins: [baseTransition]
+};
+
+(function () {
+  if (typeof document !== 'undefined') {
+    var head = document.head || document.getElementsByTagName('head')[0],
+        style = document.createElement('style'),
+        css = ".zoom-move { transition: transform .3s ease-out; } @keyframes zoomInY { from { opacity: 0; transform: scaleY(0); } 50% { opacity: 1; tranform: scaleY(1); } } .zoomInY { animation-name: zoomInY; } @keyframes zoomOutY { from { opacity: 1; } 50% { opacity: 0; transform: scaleY(0); } to { opacity: 0; } } .zoomOutY { animation-name: zoomOutY; } ";style.type = 'text/css';if (style.styleSheet) {
+      style.styleSheet.cssText = css;
+    } else {
+      style.appendChild(document.createTextNode(css));
+    }head.appendChild(style);
+  }
+})();
+
+var ZoomYTransition = { render: function () {
+    var _vm = this;var _h = _vm.$createElement;var _c = _vm._self._c || _h;return _c(_vm.componentType, _vm._g(_vm._b({ tag: "component", attrs: { "tag": _vm.tag, "enter-active-class": "zoomInY", "move-class": "zoom-move", "leave-active-class": "zoomOutY" } }, 'component', _vm.$attrs, false), _vm.hooks), [_vm._t("default")], 2);
+  }, staticRenderFns: [],
+  name: 'zoom-y-transition',
+  mixins: [baseTransition],
+  props: {
+    styles: {
+      type: Object,
+      default: function () {
+        return {
+          animationFillMode: 'both',
+          animationTimingFunction: 'cubic-bezier(.55,0,.1,1)'
+        };
+      }
+    }
+  }
+};
+
+(function () {
+  if (typeof document !== 'undefined') {
+    var head = document.head || document.getElementsByTagName('head')[0],
+        style = document.createElement('style'),
+        css = " .collapse-move { transition: transform .3s ease-in-out; } ";style.type = 'text/css';if (style.styleSheet) {
+      style.styleSheet.cssText = css;
+    } else {
+      style.appendChild(document.createTextNode(css));
+    }head.appendChild(style);
+  }
+})();
+
+var CollapseTransition = { render: function () {
+    var _vm = this;var _h = _vm.$createElement;var _c = _vm._self._c || _h;return _c(_vm.componentType, _vm._g(_vm._b({ tag: "component", attrs: { "tag": _vm.tag, "move-class": "collapse-move" }, on: { "before-enter": _vm.beforeEnter, "after-enter": _vm.afterEnter, "enter": _vm.enter, "before-leave": _vm.beforeLeave, "leave": _vm.leave, "after-leave": _vm.afterLeave } }, 'component', _vm.$attrs, false), _vm.$listeners), [_vm._t("default")], 2);
+  }, staticRenderFns: [],
+  name: 'collapse-transition',
+  mixins: [baseTransition],
+  methods: {
+    transitionStyle: function transitionStyle(duration) {
+      if ( duration === void 0 ) duration = 300;
+
+      var durationInSeconds = duration / 1000;
+      var style = durationInSeconds + "s height ease-in-out, " + durationInSeconds + "s padding-top ease-in-out, " + durationInSeconds + "s padding-bottom ease-in-out";
+      return style;
+    },
+    beforeEnter: function beforeEnter(el) {
+      var enterDuration = this.duration.enter ? this.duration.enter : this.duration;
+      el.style.transition = this.transitionStyle(enterDuration);
+      if (!el.dataset) { el.dataset = {}; }
+
+      el.dataset.oldPaddingTop = el.style.paddingTop;
+      el.dataset.oldPaddingBottom = el.style.paddingBottom;
+
+      el.style.height = '0';
+      el.style.paddingTop = 0;
+      el.style.paddingBottom = 0;
+      this.setStyles(el);
+    },
+
+    enter: function enter(el) {
+      el.dataset.oldOverflow = el.style.overflow;
+      if (el.scrollHeight !== 0) {
+        el.style.height = el.scrollHeight + 'px';
+        el.style.paddingTop = el.dataset.oldPaddingTop;
+        el.style.paddingBottom = el.dataset.oldPaddingBottom;
+      } else {
+        el.style.height = '';
+        el.style.paddingTop = el.dataset.oldPaddingTop;
+        el.style.paddingBottom = el.dataset.oldPaddingBottom;
+      }
+
+      el.style.overflow = 'hidden';
+    },
+
+    afterEnter: function afterEnter(el) {
+      // for safari: remove class then reset height is necessary
+      el.style.transition = '';
+      el.style.height = '';
+      el.style.overflow = el.dataset.oldOverflow;
+    },
+
+    beforeLeave: function beforeLeave(el) {
+      if (!el.dataset) { el.dataset = {}; }
+      el.dataset.oldPaddingTop = el.style.paddingTop;
+      el.dataset.oldPaddingBottom = el.style.paddingBottom;
+      el.dataset.oldOverflow = el.style.overflow;
+
+      el.style.height = el.scrollHeight + 'px';
+      el.style.overflow = 'hidden';
+      this.setStyles(el);
+    },
+
+    leave: function leave(el) {
+      var leaveDuration = this.duration.leave ? this.duration.leave : this.duration;
+      if (el.scrollHeight !== 0) {
+        // for safari: add class after set height, or it will jump to zero height suddenly, weired
+        el.style.transition = this.transitionStyle(leaveDuration);
+        el.style.height = 0;
+        el.style.paddingTop = 0;
+        el.style.paddingBottom = 0;
+      }
+      // necessary for transition-group
+      this.setAbsolutePosition(el);
+    },
+
+    afterLeave: function afterLeave(el) {
+      el.style.transition = '';
+      el.style.height = '';
+      el.style.overflow = el.dataset.oldOverflow;
+      el.style.paddingTop = el.dataset.oldPaddingTop;
+      el.style.paddingBottom = el.dataset.oldPaddingBottom;
+    }
+  }
+};
+
+(function () {
+  if (typeof document !== 'undefined') {
+    var head = document.head || document.getElementsByTagName('head')[0],
+        style = document.createElement('style'),
+        css = " @keyframes scaleIn { from { opacity: 0; transform: scale(0) } to { opacity: 1; } } .scaleIn { animation-name: scaleIn; } @keyframes scaleOut { from { opacity: 1; } to { opacity: 0; transform: scale(0); } } .scaleOut { animation-name: scaleOut; } .scale-move { transition: transform .3s cubic-bezier(.25, .8, .50, 1); } ";style.type = 'text/css';if (style.styleSheet) {
+      style.styleSheet.cssText = css;
+    } else {
+      style.appendChild(document.createTextNode(css));
+    }head.appendChild(style);
+  }
+})();
+
+var ScaleTransition = { render: function () {
+    var _vm = this;var _h = _vm.$createElement;var _c = _vm._self._c || _h;return _c(_vm.componentType, _vm._g(_vm._b({ tag: "component", attrs: { "tag": _vm.tag, "enter-active-class": "scaleIn", "move-class": "scale-move", "leave-active-class": "scaleOut" } }, 'component', _vm.$attrs, false), _vm.hooks), [_vm._t("default")], 2);
+  }, staticRenderFns: [],
+  name: 'scale-transition',
+  mixins: [baseTransition],
+  props: {
+    origin: {
+      type: String,
+      default: 'top left'
+    },
+    styles: {
+      type: Object,
+      default: function () {
+        return {
+          animationFillMode: 'both',
+          animationTimingFunction: 'cubic-bezier(.25,.8,.50,1)'
+        };
+      }
+    }
+  }
+};
+
+(function () {
+  if (typeof document !== 'undefined') {
+    var head = document.head || document.getElementsByTagName('head')[0],
+        style = document.createElement('style'),
+        css = ".slide-move { transition: transform .3s; } @keyframes slideYIn { from { opacity: 0; transform: translateY(-15px); } to { opacity: 1; } } .slideYIn { animation-name: slideYIn; } @keyframes slideYOut { from { opacity: 1; } to { opacity: 0; transform: translateY(-15px); } } .slideYOut { animation-name: slideYOut; } ";style.type = 'text/css';if (style.styleSheet) {
+      style.styleSheet.cssText = css;
+    } else {
+      style.appendChild(document.createTextNode(css));
+    }head.appendChild(style);
+  }
+})();
+
+var SlideYUpTransition = { render: function () {
+    var _vm = this;var _h = _vm.$createElement;var _c = _vm._self._c || _h;return _c(_vm.componentType, _vm._g(_vm._b({ tag: "component", attrs: { "tag": _vm.tag, "type": "animation", "enter-active-class": "slideYIn", "move-class": "slide-move", "leave-active-class": "slideYOut" } }, 'component', _vm.$attrs, false), _vm.hooks), [_vm._t("default")], 2);
+  }, staticRenderFns: [],
+  name: 'slide-y-up-transition',
+  mixins: [baseTransition],
+  props: {
+    styles: {
+      type: Object,
+      default: function () {
+        return {
+          animationFillMode: 'both',
+          animationTimingFunction: 'cubic-bezier(.25,.8,.50,1)'
+        };
+      }
+    }
+  }
+};
+
+(function () {
+  if (typeof document !== 'undefined') {
+    var head = document.head || document.getElementsByTagName('head')[0],
+        style = document.createElement('style'),
+        css = ".slide-move { transition: transform .3s; } @keyframes slideYDownIn { from { opacity: 0; transform: translateY(15px); } to { opacity: 1; } } .slideYDownIn { animation-name: slideYDownIn; } @keyframes slideYDownOut { from { opacity: 1; } to { opacity: 0; transform: translateY(15px); } } .slideYDownOut { animation-name: slideYDownOut; } ";style.type = 'text/css';if (style.styleSheet) {
+      style.styleSheet.cssText = css;
+    } else {
+      style.appendChild(document.createTextNode(css));
+    }head.appendChild(style);
+  }
+})();
+
+var SlideYDownTransition = { render: function () {
+    var _vm = this;var _h = _vm.$createElement;var _c = _vm._self._c || _h;return _c(_vm.componentType, _vm._g(_vm._b({ tag: "component", attrs: { "tag": _vm.tag, "enter-active-class": "slideYDownIn", "leave-active-class": "slideYDownOut" } }, 'component', _vm.$attrs, false), _vm.hooks), [_vm._t("default")], 2);
+  }, staticRenderFns: [],
+  name: 'slide-y-down-transition',
+  mixins: [baseTransition],
+  props: {
+    styles: {
+      type: Object,
+      default: function () {
+        return {
+          animationFillMode: 'both',
+          animationTimingFunction: 'cubic-bezier(.25,.8,.50,1)'
+        };
+      }
+    }
+  }
+};
+
+(function () {
+  if (typeof document !== 'undefined') {
+    var head = document.head || document.getElementsByTagName('head')[0],
+        style = document.createElement('style'),
+        css = ".slide-move { transition: transform .3s; } @keyframes slideXLeftIn { from { opacity: 0; transform: translateX(-15px); } to { opacity: 1; } } .slideXLeftIn { animation-name: slideXLeftIn; } @keyframes slideXLeftOut { from { opacity: 1; } to { opacity: 0; transform: translateX(-15px); } } .slideXLeftOut { animation-name: slideXLeftOut; } ";style.type = 'text/css';if (style.styleSheet) {
+      style.styleSheet.cssText = css;
+    } else {
+      style.appendChild(document.createTextNode(css));
+    }head.appendChild(style);
+  }
+})();
+
+var SlideXLeftTransition = { render: function () {
+    var _vm = this;var _h = _vm.$createElement;var _c = _vm._self._c || _h;return _c(_vm.componentType, _vm._g(_vm._b({ tag: "component", attrs: { "tag": _vm.tag, "enter-active-class": "slideXLeftIn", "move-class": "slide-move", "leave-active-class": "slideXLeftOut" } }, 'component', _vm.$attrs, false), _vm.hooks), [_vm._t("default")], 2);
+  }, staticRenderFns: [],
+  name: 'slide-x-left-transition',
+  mixins: [baseTransition],
+  props: {
+    styles: {
+      type: Object,
+      default: function () {
+        return {
+          animationFillMode: 'both',
+          animationTimingFunction: 'cubic-bezier(.25,.8,.50,1)'
+        };
+      }
+    }
+  }
+};
+
+(function () {
+  if (typeof document !== 'undefined') {
+    var head = document.head || document.getElementsByTagName('head')[0],
+        style = document.createElement('style'),
+        css = ".slide-move { transition: transform .3s; } @keyframes slideXRightIn { from { opacity: 0; transform: translateX(15px); } to { opacity: 1; } } .slideXRightIn { animation-name: slideXRightIn; } @keyframes slideXRightOut { from { opacity: 1; } to { opacity: 0; transform: translateX(15px); } } .slideXRightOut { animation-name: slideXRightOut; } ";style.type = 'text/css';if (style.styleSheet) {
+      style.styleSheet.cssText = css;
+    } else {
+      style.appendChild(document.createTextNode(css));
+    }head.appendChild(style);
+  }
+})();
+
+var SlideXRightTransition = { render: function () {
+    var _vm = this;var _h = _vm.$createElement;var _c = _vm._self._c || _h;return _c(_vm.componentType, _vm._g(_vm._b({ tag: "component", attrs: { "tag": _vm.tag, "enter-active-class": "slideXRightIn", "move-class": "slide-move", "leave-active-class": "slideXRightOut" } }, 'component', _vm.$attrs, false), _vm.hooks), [_vm._t("default")], 2);
+  }, staticRenderFns: [],
+  name: 'slide-x-right-transition',
+  mixins: [baseTransition],
+  props: {
+    styles: {
+      type: Object,
+      default: function () {
+        return {
+          animationFillMode: 'both',
+          animationTimingFunction: 'cubic-bezier(.25,.8,.50,1)'
+        };
+      }
+    }
+  }
+};
+
+var components = {};
+components[FadeTransition.name] = FadeTransition;
+components[ZoomCenterTransition.name] = ZoomCenterTransition;
+components[ZoomXTransition.name] = ZoomXTransition;
+components[ZoomYTransition.name] = ZoomYTransition;
+components[CollapseTransition.name] = CollapseTransition;
+components[ScaleTransition.name] = ScaleTransition;
+components[SlideYUpTransition.name] = SlideYUpTransition;
+components[SlideYDownTransition.name] = SlideYDownTransition;
+components[SlideXLeftTransition.name] = SlideXLeftTransition;
+components[SlideXRightTransition.name] = SlideXRightTransition;
+
+function install(Vue, options) {
+  if (options && options.components) {
+    options.components.forEach(function (c) { return Vue.component(c.name, components[c.name]); });
+  } else {
+    Object.keys(components).forEach(function (key) {
+      Vue.component(key, components[key]);
+    });
+  }
+}
+
+// Automatic installation if Vue has been added to the global scope.
+if (typeof window !== 'undefined' && window.Vue) {
+  window.Vue.use({ install: install });
+}
+
+var index = {
+  install: install
+};
+
+
+/* harmony default export */ __webpack_exports__["default"] = (index);
+
+
+/***/ }),
+
 /***/ "./node_modules/webpack/buildin/global.js":
 /*!***********************************!*\
   !*** (webpack)/buildin/global.js ***!
@@ -15467,7 +16117,11 @@ module.exports = g;
 __webpack_require__.r(__webpack_exports__);
 /* harmony import */ var vue__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! vue */ "./node_modules/vue/dist/vue.common.js");
 /* harmony import */ var vue__WEBPACK_IMPORTED_MODULE_0___default = /*#__PURE__*/__webpack_require__.n(vue__WEBPACK_IMPORTED_MODULE_0__);
+/* harmony import */ var vue_chat_scroll__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! vue-chat-scroll */ "./node_modules/vue-chat-scroll/dist/vue-chat-scroll.js");
+/* harmony import */ var vue_chat_scroll__WEBPACK_IMPORTED_MODULE_1___default = /*#__PURE__*/__webpack_require__.n(vue_chat_scroll__WEBPACK_IMPORTED_MODULE_1__);
 
+
+vue__WEBPACK_IMPORTED_MODULE_0___default.a.use(vue_chat_scroll__WEBPACK_IMPORTED_MODULE_1___default.a);
 vue__WEBPACK_IMPORTED_MODULE_0___default.a.component('chat-box', __webpack_require__(/*! ./components/ChatBox.vue */ "./resources/js/components/ChatBox.vue")["default"]);
 var app = new vue__WEBPACK_IMPORTED_MODULE_0___default.a({
   el: '#app',
@@ -15703,8 +16357,8 @@ __webpack_require__.r(__webpack_exports__);
 /*! no static exports found */
 /***/ (function(module, exports, __webpack_require__) {
 
-__webpack_require__(/*! c:\laragon\www\nodejs\chatapp\resources\js\app.js */"./resources/js/app.js");
-module.exports = __webpack_require__(/*! c:\laragon\www\nodejs\chatapp\resources\scss\app.scss */"./resources/scss/app.scss");
+__webpack_require__(/*! C:\laragon\www\nodejs\chatapp\resources\js\app.js */"./resources/js/app.js");
+module.exports = __webpack_require__(/*! C:\laragon\www\nodejs\chatapp\resources\scss\app.scss */"./resources/scss/app.scss");
 
 
 /***/ })

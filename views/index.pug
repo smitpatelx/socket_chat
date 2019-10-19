@@ -1,6 +1,15 @@
 extends layout
 
 block content
-  h1= title
-  p Welcome to #{title} Chat App
-  a(href="/chatapp") Navigate to chat app
+ div(class="font-semibold text-gray-500 text-center justify-center flex flex-wrap flex-row py-4 items-center")
+  a(href="https://github.com/smitpatelx" class="rounded mx-2 px-4 py-1 text-primary-600 hover:text-black shadow-lg-e") GitHub
+   i.fab.fa-github.ml-1
+  a(href="https://github.com/smitpatelx/socket_chat" class="rounded mx-2 px-4 py-1 text-primary-600 hover:text-black shadow-lg-e") Repo
+   i.fas.fa-code-branch.ml-1
+  a(href="https://www.instagram.com/netdevv/" class="rounded mx-2 px-4 py-1 text-primary-600 hover:text-black shadow-lg-e") Instagram
+   i.fab.fa-instagram.ml-1
+
+ div(class="font-semibold text-gray-500 text-center justify-center flex flex-wrap flex-row py-4 items-center")
+  p.w-full.my-2 Welcome to #{title} Chat App
+  a(href="/chatapp" class="rounded mx-2 px-4 py-1 text-white shadow-lg bg-primary-600 hover:bg-primary-300") Start
+   i.fas.fa-inbox.ml-1
