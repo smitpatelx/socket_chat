@@ -1,6 +1,7 @@
 <template>
     <div class="w-full py-3">
         <div class="flex-1 overflow-auto py-2 px-2 shadow-xl rounded-t-lg bg-white antialiased overflow-x-hidden overflow-y-visible" style="max-height: 75vh;" v-chat-scroll="{always: false, smooth: true}">
+            <p v-if="messages.length == 0" class="text-center rounded mx-2 my-6 bg-gray-100 px-4 py-1 text-primary-600 hover:text-black shadow-lg-e">You dont have any messages</p>
             <slide-x-left-transition group>
             <div v-for="(data, i) in messages" :key="i" class="flex mb-2" :class="data.user_id == name_val.id ? 'justify-end' : 'justify-start'">
                 <div class="m-2 py-1 px-3 rounded shadow-sm" :class="data.user_id == name_val.id ? 'bg-gray-300' : 'bg-primary-200'">
