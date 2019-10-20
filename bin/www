@@ -28,6 +28,12 @@ io.on('connection', function(socket){
   socket.on('chat_message', (data) => {
     io.emit('chat_message2', data);
   });
+  socket.on('active_user_list', (data) => {
+    io.emit('active_users', data);
+  });
+  socket.on('left_user_list', (data) => {
+    io.emit('active_users', data);
+  });
 });
 
 io.on('disconnect', function(){

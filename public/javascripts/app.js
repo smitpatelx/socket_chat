@@ -207,6 +207,9 @@ __webpack_require__.r(__webpack_exports__);
 //
 //
 //
+//
+//
+//
 
 
  //Chat Component
@@ -249,6 +252,31 @@ var cbi = {
       // console.log("ChatBoxIn user_id check:", data.user_id == that.name_val.id ? 'true' : 'false');
       that.messages.push(data);
     });
+    socket.on('active_users', function (data) {
+      that.messages.push(data);
+    });
+  },
+  created: function created() {
+    var socket = socket_io_client_dist_socket_io_js__WEBPACK_IMPORTED_MODULE_1___default()();
+    var user = {
+      user_id: this.name_val.id,
+      name: this.name_val.name,
+      message: '',
+      time: this.current_date.hrs,
+      type: 'joined'
+    };
+    socket.emit('active_user_list', user);
+  },
+  destroyed: function destroyed() {
+    var socket = socket_io_client_dist_socket_io_js__WEBPACK_IMPORTED_MODULE_1___default()();
+    var user = {
+      user_id: this.name_val.id,
+      name: this.name_val.name,
+      message: '',
+      time: this.current_date.hrs,
+      type: 'disconnected'
+    };
+    socket.emit('left_user_list', user);
   }
 };
 /* harmony default export */ __webpack_exports__["default"] = (cbi);
@@ -3021,7 +3049,7 @@ var render = function() {
                     "span",
                     {
                       staticClass:
-                        "self-center flex flex-wrap flex-row text-right text-primary text-sm my-1 ml-2 py-1 px-2 font-semibold rounded border border-solid border-primary"
+                        "flex flex-wrap flex-row text-right text-primary text-sm my-1 ml-2 py-1 px-2 font-semibold rounded border border-solid border-primary"
                     },
                     [
                       _c(
@@ -3033,6 +3061,7 @@ var render = function() {
                             x: "0px",
                             y: "0px",
                             width: "20px",
+                            height: "20.8px",
                             viewBox: "0 0 172 172"
                           }
                         },
@@ -3089,7 +3118,7 @@ var render = function() {
                     "span",
                     {
                       staticClass:
-                        "self-center cursor-pointer flex flex-wrap flex-row text-right text-primary hover:text-black bg-primary hover:bg-primary-800 text-sm my-1 ml-2 py-1 px-2 font-semibold rounded border border-solid border-primary",
+                        "cursor-pointer flex flex-wrap flex-row text-right text-primary hover:text-black bg-primary hover:bg-primary-800 text-sm my-1 ml-2 py-1 px-2 font-semibold rounded border border-solid border-primary",
                       on: { click: _vm.delete_name }
                     },
                     [
@@ -3102,6 +3131,7 @@ var render = function() {
                             x: "0px",
                             y: "0px",
                             width: "20px",
+                            height: "20px",
                             viewBox: "0 0 172 172"
                           }
                         },
@@ -3299,7 +3329,7 @@ var render = function() {
         ],
         staticClass:
           "flex-1 overflow-auto py-2 px-2 shadow-xl rounded-t-lg bg-white antialiased overflow-x-hidden overflow-y-visible",
-        staticStyle: { "max-height": "75vh" }
+        staticStyle: { "max-height": "70vh", height: "70vh" }
       },
       [
         _vm.messages.length == 0
@@ -3328,55 +3358,80 @@ var render = function() {
                     : "justify-start"
               },
               [
-                _c(
-                  "div",
-                  {
-                    staticClass: "m-2 py-1 px-3 rounded shadow-sm",
-                    class:
-                      data.user_id == _vm.name_val.id
-                        ? "bg-gray-300"
-                        : "bg-primary-200"
-                  },
-                  [
-                    data.user_id != _vm.name_val.id
-                      ? _c(
+                data.type
+                  ? _c(
+                      "div",
+                      {
+                        staticClass:
+                          "w-full my-1 px-3 text-center justify-center"
+                      },
+                      [
+                        _c("p", {
+                          staticClass: "text-base font-semibold",
+                          class:
+                            data.type == "joined"
+                              ? "text-green-500"
+                              : "text-red-500",
+                          domProps: {
+                            innerHTML: _vm._s(
+                              data.name +
+                                (data.type == "joined"
+                                  ? " joined chat"
+                                  : " left chat")
+                            )
+                          }
+                        })
+                      ]
+                    )
+                  : _c(
+                      "div",
+                      {
+                        staticClass: "m-2 py-1 px-3 rounded shadow-sm",
+                        class:
+                          data.user_id == _vm.name_val.id
+                            ? "bg-gray-300"
+                            : "bg-primary-200"
+                      },
+                      [
+                        data.user_id != _vm.name_val.id
+                          ? _c(
+                              "p",
+                              {
+                                staticClass: "text-left",
+                                class:
+                                  data.user_id == _vm.name_val.id
+                                    ? "text-gray-800"
+                                    : "text-gray-300"
+                              },
+                              [_vm._v(_vm._s(data.name))]
+                            )
+                          : _vm._e(),
+                        _vm._v(" "),
+                        _c(
                           "p",
                           {
-                            staticClass: "text-left",
+                            staticClass: "font-semibold",
                             class:
                               data.user_id == _vm.name_val.id
-                                ? "text-gray-800"
-                                : "text-gray-300"
+                                ? "text-black"
+                                : "text-white"
                           },
-                          [_vm._v(_vm._s(data.name))]
+                          [_vm._v(_vm._s(data.message))]
+                        ),
+                        _vm._v(" "),
+                        _c(
+                          "p",
+                          {
+                            staticClass: "text-right text-xs mt-1",
+                            class:
+                              data.user_id == _vm.name_val.id
+                                ? "text-gray-700"
+                                : "text-gray-200"
+                          },
+                          [_vm._v(_vm._s(data.time))]
                         )
-                      : _vm._e(),
-                    _vm._v(" "),
-                    _c(
-                      "p",
-                      {
-                        staticClass: "font-semibold",
-                        class:
-                          data.user_id == _vm.name_val.id
-                            ? "text-black"
-                            : "text-white"
-                      },
-                      [_vm._v(_vm._s(data.message))]
-                    ),
-                    _vm._v(" "),
-                    _c(
-                      "p",
-                      {
-                        staticClass: "text-right text-xs mt-1",
-                        class:
-                          data.user_id == _vm.name_val.id
-                            ? "text-gray-700"
-                            : "text-gray-200"
-                      },
-                      [_vm._v(_vm._s(data.time))]
+                      ]
                     )
-                  ]
-                )
               ]
             )
           }),
