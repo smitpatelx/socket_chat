@@ -20,7 +20,7 @@
             </div>
         </div>
         <form v-on:submit.prevent="submit_name" v-if="!submitted" class="w-full h-64 my-3 py-1 px-4 justify-center align-center flex bg-primary rounded shadow-sm">
-            <input autofocus tabindex="0" type="text" placeholder="First & Last" v-model.trim="name" class="self-center w-64 focus:outline-none focus:shadow-outline py-2 px-4 text-gray-700 rounded border border-solid border-gray-500">
+            <input autofocus ref="chat_input" tabindex="0" type="text" placeholder="First & Last" v-model.trim="name" class="self-center w-64 focus:outline-none focus:shadow-outline py-2 px-4 text-gray-700 rounded border border-solid border-gray-500">
             <input tabindex="0" type="submit" value="Submit" class="ml-4 self-center focus:outline-none focus:shadow-outline py-2 px-4 rounded bg-gray-400 hover:bg-gray-500 focus:bg-gray-500 font-semibold cursor-pointer text-black hover:text-white focus:text-white shadow-sm">
         </form>
         <ChatBoxIn v-else :name_val="data_to_return"></ChatBoxIn>
@@ -40,7 +40,7 @@ export default {
     },
     methods:{
         submit_name(){
-            if(this.name.length > 2) {
+            if(this.name.length > 0) {
                 this.submitted = true;
             } else {
                 this.submitted = false;
@@ -75,6 +75,9 @@ export default {
         random_id(){
             return Math.floor(Math.random()*90000) + 10000;
         }
+    },
+    mounted(){
+        this.$refs.chat_input.focus();
     }
 }
 </script>

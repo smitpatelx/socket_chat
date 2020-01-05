@@ -26,7 +26,7 @@ export default {
     },
     methods:{
         send_message(){
-            if(this.message.length > 2){
+            if(this.message.length > 0){
                 this.get_date();
                 var socket = io();
                 var msg = {
@@ -54,6 +54,9 @@ export default {
             };
             this.current_date = fullDate;
         }
+    },
+    mounted(){
+        this.$refs.message_input.focus();
     }
 }
 </script>
