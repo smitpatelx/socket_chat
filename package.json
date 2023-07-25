@@ -22,7 +22,7 @@
     "laravel-mix-purgecss": "^4.2.0",
     "morgan": "~1.9.1",
     "nodemon": "^1.19.4",
-    "pug": "^2.0.4",
+    "pug": "^3.0.1",
     "socket.io": "^2.4.0",
     "tailwindcss": "^1.1.2",
     "vue": "^2.6.10",
